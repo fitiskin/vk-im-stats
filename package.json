@@ -1,0 +1,27 @@
+{
+  "name": "vk-im-stats",
+  "id": "vk-im-stats",
+  "codename": "vk-im-stats",
+  "version": "0.0.1",
+  "description": "vk.com im analytics script and tool",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArtemFitiskin/vk-im-stats"
+  },
+  "homepage": "http://github.com/ArtemFitiskin/vk-im-stats",
+  "demo": "http://artemfitiskin.github.io/vk-im-stats/",
+  "license": "MIT",
+  "author": {
+    "name": "Artem Fitiskin",
+    "email": "me@artemfitiskin.ru",
+    "url": "http://codler.ru"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "latest",
+    "grunt-contrib-jshint": "latest",
+    "grunt-contrib-uglify": "latest",
+    "grunt-contrib-watch": "latest",
+    "grunt-contrib-less": "latest"
+  }
+}
