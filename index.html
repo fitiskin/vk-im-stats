@@ -1,0 +1,149 @@
+<!doctype html>
+<html class="no-js" lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Статистика переписки В Контакте</title>
+        <meta name="description" content="Скрипт, который показывает показатели по вашей личной переписке В Контакте, сортирует данные по друзьям">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="css/normalize.css">
+        <link rel="stylesheet" href="css/main.css">
+    </head>
+    <body>
+        <main>
+            <div id="before" class="hide">
+                <h1>Статистика переписки В Контакте</h1>
+                <p>
+                    Чтобы скрипт рассчитал статистику вашей переписки, необходимо дать ему доступ к вашим сообщениям. Для этого нужно получить токен-код по специальной ссылке.
+                </p>
+                <p>
+                    Скрипт потребляет несколько мегабайт трафика (зависит от объема вашей переписки), поэтому <i>не рекомендуется</i> его запускать на мобильных устройствах! Скрипт работает настолько быстро, насколько часто API ВКонтакте позволяет делать запросы. Если приложение будет использовать достаточное количество людей, скорость увеличится!
+                </p>
+                <p>
+                    Условия использования:
+                </p>
+                <ul>
+                    <li>ваши данные не сохраняются и не передаются куда-либо (здесь даже статистика посещений не установлена);</li>
+                    <li>данная страница является статичной и располагается на серверах GitHub;</li>
+                    <li>исходный код скрипта прозрачен и расположен <a href="https://github.com/ArtemFitiskin/vk-im-stats">в репозитории</a>, а данная страница является его демонстранией;</li>
+                    <li>автор скрипта не несет ответственности за его работу, скрипт представлен публично и поставляется как есть;</li>
+                    <li>ВКонтакте будет предупреждать вас о том, что не следует копировать данные из адресной строки (именно это вам необходимо сделать, чтобы скрипт заработал);</li>
+                    <li>если у вас есть какие-либо вопросы, вы можете задать их в нашей группе;</li>
+                    <li>пользуясь скриптом, вы соглашаетесь с данными условиями.</li>
+                </ul>
+                <p>
+                    Если вы прочитали условия и согласны с ними, перейдите по ссылке и скопируйте все, что будет в адресной строке в текстовое поле, расположенное ниже:
+                </p>
+                <h2><a id="access_link" target="_blank" href="https://oauth.vk.com/authorize?client_id=4390572&scope=4096&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&v=5.21">Ссылка на получение токена</a></h2>
+                <input type="text" name="token" value="" id="token" placeholder="скопируйте сюда содержимое адресной строки" />
+                <p>и нажмите кнопкочку: <input type="button" id="start" value="Поехали!" /></p>
+            </div>
+            <div id="after">
+                <div id="logs"></div>
+            </div>
+        </main>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.min.js"><\/script>')</script>
+        <script src="js/vendor/vk-im-stats.js"></script>
+        <script src="js/vendor/handlebars-1.0.rc.1.min.js"></script>
+        <script src="js/main.js"></script>
+
+        <script id="results" type="text/x-handlebars-template">
+            <div>
+                <img src="{{ data.user.photo_200 }}" /><br /><br />
+                Имя: {{ data.user.first_name }}<br />
+                Фамилия: {{ data.user.last_name }}
+            </div>
+            <div>
+                входящих:&nbsp;&nbsp;{{ count.messages.type.inbox }} ({{ mb count.messages.bytes.inbox }} МБ)<br />
+                исходящих: {{ count.messages.type.outbox }} ({{ mb count.messages.bytes.outbox }} МБ)<br />
+                удаленных: {{ count.messages.deleted }}<br />
+                ------------------------------------------------------- <br />
+                Всего сообщений: <b>{{ count.messages.all }}</b> ({{ mb count.messages.bytes.all }} МБ) | Соотношение: {{ relation count.messages.type }}<br />
+                Всего символов: {{ count.messages.sizes.all }} ({{ tolstoy count.messages.sizes.all }})
+            </div>
+            <br /><br />
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>
+                                Фото
+                            </th>
+                            <th>
+                                Собеседник
+                            </th>
+                            <th>
+                                Входящие
+                            </th>
+                            <th>
+                                Исходящие
+                            </th>
+                            <th>
+                                Всего
+                            </th>
+                            <th>
+                                Отнош.
+                            </th>
+                            <th>
+                                Фото
+                            </th>
+                            <th>
+                                Аудио
+                            </th>
+                            <th>
+                                Видео
+                            </th>
+                            <th>
+                                Документ
+                            </th>
+                            <th>
+                                Запись
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each data.users}}
+                        <tr>
+                            <td>
+                                <img src="{{ photo_50 }}" />
+                            </td>
+                            <td>
+                                <a href="http://vk.com/{{ screen_name }}" target="_blank">{{ first_name }} {{ last_name }}</a>
+                            </td>
+                            <td>
+                                {{ stats.type.inbox }}<br /><small>({{ mb stats.bytes.inbox }} МБ)</small>
+                            </td>
+                            <td>
+                                {{ stats.type.outbox }}<br /><small>({{ mb stats.bytes.outbox }} МБ)</small>
+                            </td>
+                            <td>
+                                {{ stats.all }}<br /><small>({{ mb stats.bytes.all }} МБ)</small>
+                            </td>
+                            <td>
+                                {{ relation stats.type }}
+                            </td>
+                            <td>
+                                {{ stats.attachments.type.photo.all }}
+                            </td>
+                            <td>
+                                {{ stats.attachments.type.audio.all }}
+                            </td>
+                            <td>
+                                {{ stats.attachments.type.video.all }}
+                            </td>
+                            <td>
+                                {{ stats.attachments.type.doc.all }}
+                            </td>
+                            <td>
+                                {{ stats.attachments.type.wall.all }}
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </script>
+    </body>
+</html>
